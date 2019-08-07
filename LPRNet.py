@@ -59,9 +59,15 @@ class LPRNet(object):
         normalization_2 = tf.keras.layers.BatchNormalization()(conv_2)
         dropout_2 = tf.keras.layers.Dropout(normalization_2, rate = 0.5)
         conv_3 = tf.keras.layers.Conv2D(filters = class_number, kernel_size = (1,13), strides = (1,1), padding = "same", activation = "relu", data_format="channels_last")(dropout_2)
-        return tf.keras.layers.BatchNormalization()(conv_3)
+        normalization_3 = tf.keras.layers.BatchNormalization()(conv_3)
 
+        #Global context embedding
+        dense_1 = tf.keras.layers.Dense(units = class_number, activation = "relu")(normalization_3)
+        concat = tf.keras.layers.concatenate(inputs = [normalization_3, dense_1], axis = -1) # Channel wise concat
+        conv_4 = tf.keras.layers.Conv2D(filters = class_number, kernel_size = (1,1), strides = (1,1), padding = "same", activation = "relu", data_format="channels_last")(concat)
+        normalization_4 = tf.keras.layers.BatchNormalization()(conv_4)
 
+        
 
 
 model = tf.keras.models.Sequential([
